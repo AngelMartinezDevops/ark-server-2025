@@ -122,11 +122,18 @@ docker compose up -d
 
 En el primer arranque, el servidor:
 1. Descargará e instalará SteamCMD
-2. Descargará los archivos del servidor ARK (~10-15 GB)
+2. Descargará los archivos del servidor ARK (~23 GB)
 3. Generará el mapa seleccionado
 4. Iniciará el servidor
 
-**Esto puede tardar 20-30 minutos** dependiendo de tu conexión.
+**Esto puede tardar 20-40 minutos** dependiendo de tu conexión.
+
+### Estado del Servidor
+
+El servidor incluye aplicaciones de monitoreo que se inician automáticamente:
+- **Heartbeat Monitor**: Verifica la salud del servidor cada minuto
+- **Scheduler**: Guardado automático cada 15 minutos
+- **RCON**: Disponible para administración remota
 
 ## Administración
 
@@ -143,10 +150,23 @@ docker compose logs -f ark-server
 docker exec -it ark-server bash
 
 # Comandos RCON comunes
-rcon ListPlayers
-rcon SaveWorld
-rcon "ServerChat Hola a todos"
-rcon DoExit
+rcon ListPlayers          # Listar jugadores conectados
+rcon SaveWorld            # Guardar el mundo
+rcon "ServerChat Hola"    # Enviar mensaje al chat
+rcon DoExit               # Apagar el servidor
+```
+
+### Verificar Estado del Servidor
+
+```bash
+# Ver si el servidor está corriendo
+docker exec ark-server bash -c "ps aux | grep ShooterGameServer | grep -v grep"
+
+# Ver puertos abiertos
+docker ps --filter name=ark-server --format "table {{.Names}}\t{{.Ports}}"
+
+# Test RCON
+docker exec ark-server rcon ListPlayers
 ```
 
 ### Reiniciar servidor
