@@ -1,0 +1,19 @@
+{
+  "name": "ark-rcon-app",
+  "version": "1.0.0",
+  "description": "ARK Server RCON CLI",
+  "main": "app.js",
+  "bin": {
+    "rcon": "./app.js"
+  },
+  "scripts": {
+    "start": "node app.js"
+  },
+  "keywords": ["ark", "server", "rcon", "cli"],
+  "author": "b3lerofonte",
+  "license": "MIT",
+  "dependencies": {
+    "rcon": "^1.0.3"
+  }
+}
+

@@ -1,0 +1,17 @@
+{
+  "name": "ark-scheduler-app",
+  "version": "1.0.0",
+  "description": "ARK Server scheduler for automatic restarts and messages",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "keywords": ["ark", "server", "scheduler"],
+  "author": "b3lerofonte",
+  "license": "MIT",
+  "dependencies": {
+    "node-cron": "^3.0.2",
+    "rcon": "^1.0.3"
+  }
+}
+

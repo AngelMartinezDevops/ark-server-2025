@@ -1,0 +1,16 @@
+{
+  "name": "ark-heartbeat-app",
+  "version": "1.0.0",
+  "description": "ARK Server heartbeat monitor",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "keywords": ["ark", "server", "heartbeat", "monitor"],
+  "author": "b3lerofonte",
+  "license": "MIT",
+  "dependencies": {
+    "rcon": "^1.0.3"
+  }
+}
+

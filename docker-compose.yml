@@ -1,0 +1,101 @@
+version: '3.8'
+
+services:
+  ark-server:
+    build: .
+    image: b3lerofonte/ark-server:latest
+    container_name: ark-server
+    restart: unless-stopped
+    
+    # Puertos ARK
+    ports:
+      - "7777:7777/udp"    # Puerto de juego
+      - "7778:7778/udp"    # Raw UDP socket
+      - "27015:27015/udp"  # Query port
+      - "27020:27020/tcp"  # RCON port
+    
+    # Variables de entorno del servidor
+    environment:
+      # Configuración básica
+      - ARK_SESSION_NAME=ARK Server Docker - TheIsland
+      - ARK_SERVER_PASSWORD=
+      - ARK_ADMIN_PASSWORD=changeme123
+      - ARK_MAX_PLAYERS=70
+      - ARK_SERVER_MAP=TheIsland
+      
+      # Puertos (debe coincidir con los expuestos)
+      - ARK_GAME_PORT=7777
+      - ARK_QUERY_PORT=27015
+      - ARK_RAW_SOCKETS_PORT=7778
+      - ARK_RCON_PORT=27020
+      - ARK_RCON_ENABLE=True
+      
+      # Configuración de juego
+      - ARK_DIFFICULTY=4.0
+      - ARK_SERVER_PVE=False
+      - ARK_ENABLE_PVP_GAMMA=False
+      - ARK_DISABLE_DINO_DECAY=False
+      - ARK_DISABLE_STRUCTURE_DECAY=False
+      - ARK_ALLOW_FLYER_SPEED_LEVELING=False
+      
+      # Multiplicadores
+      - ARK_TAMING_SPEED_MULTIPLIER=1.0
+      - ARK_HARVEST_AMOUNT_MULTIPLIER=1.0
+      - ARK_XP_MULTIPLIER=1.0
+      
+      # Opciones de actualización
+      - ARK_UPDATE_ON_START=1
+      - ARK_BACKUP_ON_STOP=1
+      - ARK_NOTIFY_ON_UPDATE=0
+      - ARK_WARN_ON_STOP=0
+      
+      # BattleEye y Crossplay
+      - ARK_BATTLEYE=True
+      - ARK_SERVER_CROSSPLAY=False
+      
+      # Scheduler (opcional)
+      - ARK_AUTO_RESTART_ENABLED=false
+      - ARK_AUTO_RESTART_CRON=0 4 * * *
+      
+      # Heartbeat monitor
+      - HEARTBEAT_INTERVAL=60000
+      - HEARTBEAT_VERBOSE=false
+      
+      # RCON para apps
+      - RCON_HOST=localhost
+      
+      # Timezone
+      - TZ=Europe/Madrid
+    
+    # Volúmenes
+    volumes:
+      - ark-data:/steamcmd/ark
+      - ark-cluster:/ark-cluster  # Para clusters
+    
+    # Recursos (ajustar según tu hardware)
+    # ARK consume bastante RAM, mínimo 8GB recomendado
+    deploy:
+      resources:
+        limits:
+          memory: 12G
+        reservations:
+          memory: 8G
+    
+    # Logging
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  ark-data:
+    driver: local
+  ark-cluster:
+    driver: local
+
+# Configuración de red (opcional)
+# networks:
+#   default:
+#     driver: bridge
+
