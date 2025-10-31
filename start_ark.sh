@@ -17,10 +17,10 @@ APP_DIR="/app"
 # App ID de ARK Dedicated Server
 ARK_APP_ID="376030"
 
-# Crear directorios si no existen
-mkdir -p "${ARK_DIR}"
-mkdir -p "${ARK_DIR}/ShooterGame/Saved/Config/LinuxServer"
-mkdir -p "${ARK_DIR}/ShooterGame/Saved/SavedArks"
+# Arreglar permisos del directorio de ARK antes de instalar
+if [ -d "/steamcmd/ark" ]; then
+    chown -R docker:docker /steamcmd/ark
+fi
 
 # Función para logging
 log() {
@@ -31,23 +31,15 @@ log() {
 install_or_update_ark() {
     log "Verificando instalación de ARK..."
     
-    cd "${STEAMCMD_DIR}"
-    
     if [ "${ARK_UPDATE_ON_START}" = "1" ]; then
         log "Actualizando servidor ARK..."
-        ./steamcmd.sh +force_install_dir "${ARK_DIR}" \
-            +login anonymous \
-            +app_update ${ARK_APP_ID} \
-            +quit
+        su -s /bin/bash -c "cd ${STEAMCMD_DIR} && ./steamcmd.sh +force_install_dir ${ARK_DIR} +login anonymous +app_update ${ARK_APP_ID} +quit" docker
         log "Actualización completada."
     else
         # Solo instalar si no existe
         if [ ! -f "${ARK_DIR}/ShooterGame/Binaries/Linux/ShooterGameServer" ]; then
             log "Instalando servidor ARK por primera vez..."
-            ./steamcmd.sh +force_install_dir "${ARK_DIR}" \
-                +login anonymous \
-                +app_update ${ARK_APP_ID} validate \
-                +quit
+            su -s /bin/bash -c "cd ${STEAMCMD_DIR} && ./steamcmd.sh +force_install_dir ${ARK_DIR} +login anonymous +app_update ${ARK_APP_ID} validate +quit" docker
             log "Instalación completada."
         else
             log "Servidor ARK ya está instalado. Saltando actualización."
@@ -62,6 +54,10 @@ generate_config() {
     CONFIG_DIR="${ARK_DIR}/ShooterGame/Saved/Config/LinuxServer"
     GAME_INI="${CONFIG_DIR}/Game.ini"
     GAMEUSERSETTINGS_INI="${CONFIG_DIR}/GameUserSettings.ini"
+    
+    # Crear directorios si no existen
+    mkdir -p "${CONFIG_DIR}"
+    mkdir -p "${ARK_DIR}/ShooterGame/Saved/SavedArks"
     
     # Crear Game.ini básico si no existe
     if [ ! -f "${GAME_INI}" ]; then
@@ -260,6 +256,10 @@ build_start_args() {
 # Instalar/Actualizar servidor
 install_or_update_ark
 
+# Arreglar permisos después de la instalación de Steam
+log "Ajustando permisos de archivos..."
+chown -R 1000:1000 /steamcmd/ark 2>/dev/null || true
+
 # Generar configuración
 generate_config
 
@@ -302,6 +302,7 @@ log "=========================================="
 # Cambiar al directorio del servidor
 cd "${ARK_DIR}/ShooterGame/Binaries/Linux"
 
-# Iniciar servidor ARK
-exec ./ShooterGameServer ${START_ARGS}
+# Cambiar al usuario docker para ejecutar el servidor
+log "Cambiando a usuario docker para ejecutar el servidor..."
+exec su -s /bin/bash -c "./ShooterGameServer ${START_ARGS}" docker
 

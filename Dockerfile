@@ -98,7 +98,8 @@ COPY update_check.sh /app/update_check.sh
 COPY install.txt /app/install.txt
 
 # Convertir finales de línea de Windows a Unix
-RUN sed -i 's/\r$//' /app/*.sh
+RUN sed -i 's/\r$//' /app/*.sh && \
+    sed -i 's/\r$//' /app/rcon_app/app.js
 
 # ============================================
 # CONFIGURAR PERMISOS
@@ -126,9 +127,6 @@ VOLUME ["/steamcmd/ark"]
 # ============================================
 WORKDIR /app
 
-# Cambiar a usuario docker
-USER docker
-
-# Script de inicio
+# Script de inicio (corre como root para poder hacer chown)
 CMD ["/bin/bash", "/app/start_ark.sh"]
 
